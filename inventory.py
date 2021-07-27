@@ -1,3 +1,5 @@
+import json
+
 
 class Item:
     def __init__(self, name: str, quantity: int, description=""):
@@ -7,6 +9,9 @@ class Item:
 
     def __str__(self):
         return "{:<20}\t\t{:<4d}\t\t{:<100}\t\t\n".format(self.name, self.quantity, self.description)
+
+    def toDict(self):
+        return {"name": self.name, "quantity": self.quantity, "description": self.description}
 
 
 class Inventory:
@@ -33,10 +38,44 @@ class Inventory:
         self.inventory[0].append(item_id)
 
     def editItem(self, item_id: int, name="", quantity=-1, description=""):
-        self.inventory[item_id].name = name
+        if name:
+            self.inventory[item_id].name = name
+        if quantity >= 0:
+            self.inventory[item_id].quantity = quantity
+        if description:
+            self.inventory[item_id].description = description
 
     def loadInventory(self, path: str):
-        pass
+        with open(path, 'r') as file:
+            self.inventory = json.load(file)
+            #convert keys to ints and value to item objects
+            temp_dict = dict()
+            for key in self.inventory.keys():
+                if key != "0":
+                    temp_name = self.inventory[key]['name']
+                    temp_quantity = self.inventory[key]['quantity']
+                    temp_description = self.inventory[key]['description']
+                    temp_dict[int(key)] = Item(temp_name, temp_quantity, temp_description)
+                else:
+                    temp_dict[int(key)] = self.inventory[key].copy()
+
+            self.inventory = temp_dict
+
+    def saveInventory(self, path: str):
+
+        def stringify():
+            #convert item objects in the dict to strings
+            temp = dict()
+            temp[0] = self.inventory[0]
+            for key in self.inventory.keys():
+                if key != 0:
+                    temp[key] = self.inventory[key].toDict()
+
+            return temp
+
+        with open(path, 'w') as file:
+
+            json.dump(stringify(), file, indent=1)
 
     def __str__(self):
 
@@ -50,4 +89,6 @@ class Inventory:
 
         s = "".join(temp)
         return inv_str+s
-        #return str(self.inventory)
+
+
+

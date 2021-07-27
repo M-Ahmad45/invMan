@@ -11,11 +11,17 @@ inv.addItem(apple)
 inv.addItem(cpu)
 inv.addItem(gpu)
 
-print(inv)
+#print(inv)
 
 inv.removeItem(3)
-print(inv)
+#print(inv)
 
 inv.addItem(ram)
 inv.editItem(1,name="mango")
-print(inv)
+#print(inv)
+inv.saveInventory("inv.json")
+
+inv2 = Inventory()
+inv2.loadInventory("inv.json")
+print(inv2)
+#print(inv2.inventory)

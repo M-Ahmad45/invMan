@@ -63,19 +63,22 @@ class Inventory:
 
     def saveInventory(self, path: str):
 
-        def stringify():
-            #convert item objects in the dict to strings
-            temp = dict()
-            temp[0] = self.inventory[0]
-            for key in self.inventory.keys():
-                if key != 0:
-                    temp[key] = self.inventory[key].toDict()
 
-            return temp
+        #convert item objects in the dict to strings
+        temp = dict()
+        temp[0] = self.inventory[0]
+        for key in self.inventory.keys():
+            if key != 0:
+                temp[key] = self.inventory[key].toDict()
+
+
 
         with open(path, 'w') as file:
 
-            json.dump(stringify(), file, indent=1)
+            json.dump(temp, file, indent=1)
+
+    def isEmpty(self):
+        return len(self.inventory.keys()) > 1
 
     def __str__(self):
 

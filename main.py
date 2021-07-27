@@ -1,5 +1,4 @@
-import json
-from inventory import Inventory, Item
+'''
 
 apple = Item(name="apple",quantity=10)
 cpu = Item(name="9900k",quantity=12,description="brand new")
@@ -25,3 +24,10 @@ inv2 = Inventory()
 inv2.loadInventory("inv.json")
 print(inv2)
 #print(inv2.inventory)
+'''
+
+from ui import UI
+
+if __name__ == '__main__':
+    ui = UI()
+    ui.menu()

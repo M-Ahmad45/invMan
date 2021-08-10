@@ -1,0 +1,23 @@
+{
+ "0": [],
+ "1": {
+  "name": "Transistor",
+  "quantity": 15,
+  "description": "NPN BJT"
+ },
+ "2": {
+  "name": "MOSFET",
+  "quantity": 10,
+  "description": "N Channel "
+ },
+ "3": {
+  "name": "Gskkil",
+  "quantity": 50,
+  "description": "16gb ddr4 3600mhz dual channel"
+ },
+ "4": {
+  "name": "capacitor",
+  "quantity": 10,
+  "description": "non polar 10pF"
+ }
+}

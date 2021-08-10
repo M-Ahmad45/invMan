@@ -23,15 +23,25 @@ class Inventory:
         if path:
             self.loadInventory(path)
 
-    def addItem(self, item: Item):
+    def addItem(self, item: Item = None, name="", quantity=-1, description="" ):
         if self.inventory[0] == []:
-            # noinspection PyTypeChecker
-            self.inventory[self._nextId] = item
+
+            if item is not None:
+                # noinspection PyTypeChecker
+                self.inventory[self._nextId] = item
+            else:
+                # noinspection PyTypeChecker
+                self.inventory[self._nextId] = Item(name, quantity, description)
             self._nextId += 1
         else:
             temp = self.inventory[0].pop()
-            # noinspection PyTypeChecker
-            self.inventory[temp] = item
+
+            if item is not None:
+                # noinspection PyTypeChecker
+                self.inventory[temp] = item
+            else:
+                # noinspection PyTypeChecker
+                self.inventory[temp] = Item(name, quantity, description)
 
     def removeItem(self, item_id: int):
         self.inventory[item_id] = None
@@ -60,6 +70,7 @@ class Inventory:
                     temp_dict[int(key)] = self.inventory[key].copy()
 
             self.inventory = temp_dict
+            self._nextId = max(self.inventory.keys()) + 1
 
     def saveInventory(self, path: str):
 
@@ -71,10 +82,7 @@ class Inventory:
             if key != 0:
                 temp[key] = self.inventory[key].toDict()
 
-
-
         with open(path, 'w') as file:
-
             json.dump(temp, file, indent=1)
 
     def isEmpty(self):

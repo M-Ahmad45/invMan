@@ -25,6 +25,7 @@ class UI:
                           "remove": "Remove Item from inventory",
                           "edit": "Edit Item in inventory",
                           "save": "Save inventory",
+                          "show": "Show inventory",
                           "clrscr": "Clear screen",
                           "quit": "Quit Inventory Manager",
                           "quit_ws": "Quit without saving",
@@ -48,7 +49,8 @@ class UI:
                                                    self.__options["edit"],
                                                    self.__options["save"],
                                                    self.__options["clrscr"],
-                                                   self.__options["quit"]
+                                                   self.__options["quit"],
+                                                   self.__options["show"]
                                                    ]).ask()
             if c == self.__options["add"]:
                 self.__addItem()
@@ -60,6 +62,8 @@ class UI:
                 self.__save()
             elif c == self.__options["clrscr"]:
                 clrscr()
+            elif c == self.__options["show"]:
+                self.__showInventory()
             elif c == self.__options["quit"]:
                 if self.u_changes:
                     clrscr()
@@ -79,6 +83,10 @@ class UI:
     def __load(self):
         os.chdir(self.__options["inv_dir"])
         file = q.path("Please select json inventory file").ask()
+        if not file:
+            clrscr()
+            self.menu()
+
         self.__options["inv_file"] = file
         self.inventory.loadInventory(file)
         self.editor_menu()
@@ -96,7 +104,35 @@ class UI:
         self.u_changes = True
 
     def __removeItem(self):
-        pass
+        id = int(input("Enter id:"))
+        if self.inventory.removeItem(id):
+            print("Item Removed Successfully")
+        else:
+            print("Invalid ID")
 
     def __editItem(self):
+        id = int(input("Enter id:"))
+        clrscr()
+        temp = self.inventory.atId(id)
+        name = temp["name"]
+        quantity = temp["quantity"]
+        description = temp["description"]
+        print(f"Editing id:{id}\t name:{name}\t quantity:{quantity}\t description:{description}")
         pass
+        print("Leave the option empty if you do not want to modify")
+        name = input("New Name:")
+        quantity = input("New Quantity:")
+        description = input("New Description:")
+
+        if quantity.isdigit():
+            quantity = int(quantity)
+        else:
+            quantity = -1
+        self.inventory.editItem(id, name, quantity, description)
+        input("Changes applied press enter to continue")
+        clrscr()
+
+    def __showInventory(self):
+        clrscr()
+        print(self.inventory)
+        input("\nPress enter to continue")

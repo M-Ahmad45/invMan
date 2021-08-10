@@ -17,7 +17,7 @@ class UI:
     def __init__(self):
         self.inventory = Inventory()
         #menu option strings
-        self.__options = {"inv_dir": "./inventories",
+        self.__options = {"inv_dir": "inventories",
                           "inv_file": "",
                           "load": "Load inventory",
                           "create": "Create inventory",
@@ -33,14 +33,19 @@ class UI:
         self.u_changes = False #unsaved changes
 
     def menu(self):
-        c = q.select("please select", choices=[self.__options["load"],
-                                               self.__options["create"]
-                                               ]).ask()
+        while True:
+            c = q.select("please select", choices=[self.__options["load"],
+                                                   self.__options["create"],
+                                                   self.__options["quit"]
+                                                   ]).ask()
 
-        if c == self.__options["load"]:
-            self.__load()
-        elif c == self.__options["create"]:
-            pass
+            if c == self.__options["load"]:
+                self.__load()
+            elif c == self.__options["create"]:
+                self.__create()
+            elif c == self.__options["quit"]:
+                clrscr()
+                break
 
     def editor_menu(self):
         while True:
@@ -81,18 +86,24 @@ class UI:
                     break
 
     def __load(self):
-        os.chdir(self.__options["inv_dir"])
+        print(os.getcwd())
+        if not os.getcwd().endswith(self.__options["inv_dir"]):
+            os.chdir(self.__options["inv_dir"])
         file = q.path("Please select json inventory file").ask()
         if not file:
             clrscr()
             print("No file selected")
-            self.menu()
-
-        self.__options["inv_file"] = file
-        self.inventory.loadInventory(file)
-        self.editor_menu()
+            return
+        try:
+            self.inventory.loadInventory(file)
+            self.__options["inv_file"] = file
+            self.editor_menu()
+        except FileNotFoundError:
+            input("File Not Found. Press Enter to continue")
 
     def __save(self):
+        if not os.getcwd().endswith(self.__options["inv_dir"]):
+            os.chdir(self.__options["inv_dir"])
         self.inventory.saveInventory(self.__options["inv_file"])
         self.u_changes = False
 
@@ -154,3 +165,8 @@ class UI:
         clrscr()
         print(self.inventory)
         input("\nPress enter to continue")
+
+    def __create(self):
+        file = input("Enter Inventory name:")
+        self.__options["inv_file"] = file+".json"
+        self.editor_menu()

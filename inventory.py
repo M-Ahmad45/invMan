@@ -44,8 +44,12 @@ class Inventory:
                 self.inventory[temp] = Item(name, quantity, description)
 
     def removeItem(self, item_id: int):
-        self.inventory[item_id] = None
-        self.inventory[0].append(item_id)
+        if item_id in self.inventory.keys():
+            self.inventory[item_id] = None
+            self.inventory[0].append(item_id)
+            return True
+        else:
+            return False
 
     def editItem(self, item_id: int, name="", quantity=-1, description=""):
         if name:
@@ -74,7 +78,6 @@ class Inventory:
 
     def saveInventory(self, path: str):
 
-
         #convert item objects in the dict to strings
         temp = dict()
         temp[0] = self.inventory[0]
@@ -87,6 +90,9 @@ class Inventory:
 
     def isEmpty(self):
         return len(self.inventory.keys()) > 1
+
+    def atId(self, id: int):
+        return self.inventory[id].toDict() # converting item object to dict representation
 
     def __str__(self):
 

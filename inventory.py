@@ -91,8 +91,11 @@ class Inventory:
     def isEmpty(self):
         return len(self.inventory.keys()) > 1
 
-    def atId(self, id: int):
-        return self.inventory[id].toDict() # converting item object to dict representation
+    def atId(self, item_id: int):
+        if item_id in self.inventory.keys():
+            return self.inventory[item_id].toDict() # converting item object to dict representation
+        else:
+            return {}
 
     def __str__(self):
 

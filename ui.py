@@ -17,7 +17,7 @@ class UI:
     def __init__(self):
         self.inventory = Inventory()
         #menu option strings
-        self.__options = {"inv_dir": "./inventories",
+        self.__options = {"inv_dir": "inventories",
                           "inv_file": "",
                           "load": "Load inventory",
                           "create": "Create inventory",
@@ -33,14 +33,19 @@ class UI:
         self.u_changes = False #unsaved changes
 
     def menu(self):
-        c = q.select("please select", choices=[self.__options["load"],
-                                               self.__options["create"]
-                                               ]).ask()
+        while True:
+            c = q.select("please select", choices=[self.__options["load"],
+                                                   self.__options["create"],
+                                                   self.__options["quit"]
+                                                   ]).ask()
 
-        if c == self.__options["load"]:
-            self.__load()
-        elif c == self.__options["create"]:
-            pass
+            if c == self.__options["load"]:
+                self.__load()
+            elif c == self.__options["create"]:
+                self.__create()
+            elif c == self.__options["quit"]:
+                clrscr()
+                break
 
     def editor_menu(self):
         while True:
@@ -81,58 +86,87 @@ class UI:
                     break
 
     def __load(self):
-        os.chdir(self.__options["inv_dir"])
+        print(os.getcwd())
+        if not os.getcwd().endswith(self.__options["inv_dir"]):
+            os.chdir(self.__options["inv_dir"])
         file = q.path("Please select json inventory file").ask()
         if not file:
             clrscr()
-            self.menu()
-
-        self.__options["inv_file"] = file
-        self.inventory.loadInventory(file)
-        self.editor_menu()
+            print("No file selected")
+            return
+        try:
+            self.inventory.loadInventory(file)
+            self.__options["inv_file"] = file
+            self.editor_menu()
+        except FileNotFoundError:
+            input("File Not Found. Press Enter to continue")
 
     def __save(self):
+        if not os.getcwd().endswith(self.__options["inv_dir"]):
+            os.chdir(self.__options["inv_dir"])
         self.inventory.saveInventory(self.__options["inv_file"])
         self.u_changes = False
 
     def __addItem(self):
         name = input("Please enter item name:")
-        quantity = int(input("Please enter item quantity:"))
-        description = input("Please enter item description:")
-        self.inventory.addItem(name=name, quantity=quantity, description=description)
-        print("Item added successfully.")
-        self.u_changes = True
+        if name:
+            try:
+                quantity = int(input("Please enter item quantity:"))
+                description = input("Please enter item description:")
+                self.inventory.addItem(name=name, quantity=quantity, description=description)
+                print("Item added successfully.")
+                self.u_changes = True
+            except TypeError:
+                input("Please only enter integers. Press Enter to continue")
+        else:
+            input("Empty Name not allowed. Press Enter to continue")
 
     def __removeItem(self):
-        id = int(input("Enter id:"))
-        if self.inventory.removeItem(id):
-            print("Item Removed Successfully")
-        else:
-            print("Invalid ID")
+        try:
+            item_id = int(input("Enter id:"))
+            if self.inventory.removeItem(item_id):
+                print("Item Removed Successfully")
+                self.u_changes = True
+            else:
+                input("Invalid ID. Press Enter to continue")
+        except TypeError:
+            input("Please only enter integers. Press Enter to continue")
 
     def __editItem(self):
-        id = int(input("Enter id:"))
-        clrscr()
-        temp = self.inventory.atId(id)
-        name = temp["name"]
-        quantity = temp["quantity"]
-        description = temp["description"]
-        print(f"Editing id:{id}\t name:{name}\t quantity:{quantity}\t description:{description}")
-        pass
-        print("Leave the option empty if you do not want to modify")
-        name = input("New Name:")
-        quantity = input("New Quantity:")
-        description = input("New Description:")
+        try:
+            item_id = int(input("Enter id:"))
+            clrscr()
+            temp = self.inventory.atId(item_id)
+            if temp == {}:
+                input("Invalid ID. Press Enter to continue")
+                return
+            name = temp["name"]
+            quantity = temp["quantity"]
+            description = temp["description"]
+            print(f"Editing id:{item_id}\t name:{name}\t quantity:{quantity}\t description:{description}")
+            print("Leave the option empty if you do not want to modify")
+            name = input("New Name:")
+            quantity = input("New Quantity:")
+            description = input("New Description:")
 
-        if quantity.isdigit():
-            quantity = int(quantity)
-        else:
-            quantity = -1
-        self.inventory.editItem(id, name, quantity, description)
-        input("Changes applied press enter to continue")
-        clrscr()
+            if quantity.isdigit():
+                quantity = int(quantity)
+            else:
+                quantity = -1
+            self.inventory.editItem(item_id, name, quantity, description)
+            self.u_changes = True
+            input("Changes applied press enter to continue")
+            clrscr()
+
+        except TypeError:
+            input("Please only enter integer as id. Press Enter to continue")
 
     def __showInventory(self):
         clrscr()
         print(self.inventory)
         input("\nPress enter to continue")
+
+    def __create(self):
+        file = input("Enter Inventory name:")
+        self.__options["inv_file"] = file+".json"
+        self.editor_menu()

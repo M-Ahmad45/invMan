@@ -19,5 +19,10 @@
   "name": "capacitor",
   "quantity": 10,
   "description": "non polar 10pF"
+ },
+ "5": {
+  "name": "sunflower",
+  "quantity": 100,
+  "description": "best flower"
  }
 }
